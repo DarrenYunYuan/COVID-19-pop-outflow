@@ -29,8 +29,6 @@ It's the dummies data of 31 province (Except Hong Kong, Macau and Taiwan)
 This directory saves the project results and figures. 
 
 ### nature_model_submit.py
-This Python scripts is to solve the problem of nonlinear model estimation. In this Paper, we proposed 2 types of static models, 6 types of dynamic models, and 4 types of dynamic increased models, and we used LMFIT module to estimate the unknown parameters. The models' form are as as following:
-***Exponential static Model***   
-f(x)=αE
+This Python scripts is to solve the problem of nonlinear model estimation. In this Paper, we proposed 2 types of static models(Exponential & Power static Model), 6 types of dynamic models(Exponential-Logistic model, Exponential-gompertz model, Exponential-Richards model, Power-Logistic model, Power-gompertz model, Power-Richards model), and 4 types of dynamic increased models(dF(X|t)/dt), and we used LMFIT module to estimate the unknown parameters.
 
 
