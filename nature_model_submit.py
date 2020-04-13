@@ -5,32 +5,19 @@ import numpy as np
 from lmfit import Model  # non-linear optimization by Levenberg-Marquardt algorithm
 
 '''
-城市统计年鉴（2018）中有298个城市，其中海南省三沙市比较特殊，没有人口数据，所以剔除；
-剩余297个城市中缺失GDP（地区生产总值）数据的城市有：嘉峪关、儋州、中山、东莞和重庆
-查询"中国统计信息网"相关报告补充这5个城市的GDP数据（2017年内），
-1）嘉峪关（2109900万元）：http://www.tjcn.org/tjgb/28gs/35595.html
-2）儋州（2880400万元）：http://www.tjcn.org/tjgb/21hn/35463.html
-3）中山（34503100万元）：http://www.tjcn.org/tjgb/19gd/35456.html
-4）东莞（75821200万元）：http://www.tjcn.org/tjgb/19gd/35455.html
-5）重庆（195002700万元）：http://www.tjcn.org/tjgb/22cq/35464.html
-
-注：疫情数据Wuhan-2019-nCoV.csv为病例实际统计时间，发布时间与统计相差1天（从2月7日起，直辖市除外）
-疫情数据来源：https://github.com/canghailan/Wuhan-2019-nCoV
-'''
-'''
 estimate method:
 We use the source code library of lmfit in python
 “LMFIT: Non-linear least-square minimization and curve-fitting for Python” (Newville et al. 2016)
 to estimate the parameters in our models. The relevant codes are provided as follows.
 '''
 data_path = "nature-data/pneumonia_panel_296_cities(submit).csv"
-days = 27
+days = 27 # from Jan. 24 to Feb. 19
 
 INF = 99999999999999
 NAN = 0
 
 
-def pearson_correlation_coefficient(y="confirmed", x=["Wuhan_outflow", "population", "GDP", "distance_to_wuhan(km)",
+def pearson_correlation_coefficient(y="confirmed", x=["wuhan_outflow", "population", "gdp", "distance_to_wuhan(km)",
                                                       "novel_coronavirus_search", "sars_search",
                                                       "wuhan_pneumonia_search", "flu_search",
                                                       "atypical_pneumonia_search", "surgical_mask_search",
@@ -69,7 +56,7 @@ def pearson_correlation_coefficient(y="confirmed", x=["Wuhan_outflow", "populati
         txt = [str(item) for item in txt]
         file.write(",".join(txt))
         file.write("\n")
-    df = data[data["day"] == 27]  # 2月19日的截面数据
+    df = data[data["date"] == "2020-02-19"]
     x.insert(0, y)
     df[x].corr().to_excel("nature-output/corr_matrix.xlsx", encoding="utf-8-sig")
 
@@ -105,9 +92,9 @@ def normalization(data, variables):
 
 def province_dummies(data):
     return np.array(data[["Shanghai", "Yunnan", "Neimenggu", "Beijing", "Jilin", "Sichuan", "Tianjin", "Ningxia",
-                          "Anhui", "Shandong", "Shanxi", "Guangdong", "Guangxi", "Xinjiang", "Jiangsu", "JIangxi",
+                          "Anhui", "Shandong", "Shanxi", "Guangdong", "Guangxi", "Xinjiang", "Jiangsu", "Jiangxi",
                           "Hebei", "Henan", "Zhejiang", "Hainan", "Hubei", "Hunan", "Gansu", "Fujian", "Xizang",
-                          "Guizhou", "Liaoning", "Chongqing", "Shanxi_", "Qinghai", "Heilongjiang"]].values)
+                          "Guizhou", "Liaoning", "Chongqing", "Shaanxi", "Qinghai", "Heilongjiang"]].values)
 
 
 # Daily Exponential-Static Model
@@ -134,7 +121,7 @@ def exponential_model(X, alpha, beta_1, beta_2, beta_3, beta_4, beta_5, lambda_1
     return R
 
 
-def exponential_static_model_estimate_everyday(y="confirmed", x=["Wuhan_outflow", "GDP", "population"]):
+def exponential_static_model_estimate_everyday(y="confirmed", x=["wuhan_outflow", "gdp", "population"]):
     data = pd.read_csv(data_path)
     province = pd.read_csv("nature-data/province_fix.csv")
     data = pd.merge(data, province, on="province", how="left")
@@ -176,7 +163,7 @@ def exponential_static_model_estimate_everyday(y="confirmed", x=["Wuhan_outflow"
     file.close()
 
 
-def exponential_static_model_estimate(date="2020-01-28", y="confirmed", x=["Wuhan_outflow", "GDP", "population"]):
+def exponential_static_model_estimate(date="2020-01-28", y="confirmed", x=["wuhan_outflow", "gdp", "population"]):
     data = pd.read_csv(data_path)
     province = pd.read_csv("nature-data/province_fix.csv")
     data = pd.merge(data, province, on="province", how="left")
@@ -287,7 +274,7 @@ def exponential_richards_model(X, g, r, ti, alpha, beta_1, beta_2, beta_3, beta_
     return R
 
 
-def exponential_dynamic_model_estimate(end_day=27, y="confirmed", x=["Wuhan_outflow", "GDP", "population"]):
+def exponential_dynamic_model_estimate(end_day=27, y="confirmed", x=["wuhan_outflow", "gdp", "population"]):
     data = pd.read_csv(data_path)
     data.fillna(0, inplace=True)
     data = standardization(data, x)
@@ -346,7 +333,7 @@ def exponential_dynamic_model_estimate(end_day=27, y="confirmed", x=["Wuhan_outf
     print(result.fit_report())
     print("R square of ER model is ", r2)
     return data[
-        ["city_cn", "city_en", "province", "Wuhan_outflow", "GDP", "population", "day", "date", y, "%s_pred" % y]]
+        ["city_cn", "city_en", "province", "wuhan_outflow", "gdp", "population", "day", "date", y, "%s_pred" % y]]
 
 
 # Daily Power-Static Model
@@ -372,7 +359,7 @@ def power_model(X, alpha, beta_1, beta_2, beta_3, beta_4, beta_5, lambda_1, lamb
     return R
 
 
-def power_static_model_estimate_everyday(y="confirmed", x=["Wuhan_outflow", "GDP", "population"]):
+def power_static_model_estimate_everyday(y="confirmed", x=["wuhan_outflow", "gdp", "population"]):
     data = pd.read_csv(data_path)
     province = pd.read_csv("nature-data/province_fix.csv")
     data = pd.merge(data, province, on="province", how="left")
@@ -486,7 +473,7 @@ def power_richards_model(X, g, r, ti, alpha, beta_1, beta_2, beta_3, beta_4, bet
     return R
 
 
-def power_dynamic_model_estimate(end_day=27, y="confirmed", x=["Wuhan_outflow", "GDP", "population"]):
+def power_dynamic_model_estimate(end_day=27, y="confirmed", x=["wuhan_outflow", "gdp", "population"]):
     data = pd.read_csv(data_path)
     data.fillna(0, inplace=True)
     data = normalization(data, x)
@@ -601,7 +588,7 @@ def negative_number_to_zero(x):
         return x
 
 
-def exponential_dynamic_increased_model_estimate(end_day=27, y="confirmed", x=["Wuhan_outflow", "GDP", "population"]):
+def exponential_dynamic_increased_model_estimate(end_day=27, y="confirmed", x=["wuhan_outflow", "gdp", "population"]):
     data = pd.read_csv(data_path)
     data.fillna(0, inplace=True)
     data = standardization(data, x)
@@ -700,7 +687,7 @@ def power_gompertz_increased_model(X, a, b, alpha, beta_1, beta_2, beta_3, beta_
     return R
 
 
-def power_dynamic_increased_model_estimate(end_day=27, y="confirmed", x=["Wuhan_outflow", "GDP", "population"]):
+def power_dynamic_increased_model_estimate(end_day=27, y="confirmed", x=["wuhan_outflow", "gdp", "population"]):
     data = pd.read_csv(data_path)
     data.fillna(0, inplace=True)
     data = normalization(data, x)

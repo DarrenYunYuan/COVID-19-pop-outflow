@@ -8,27 +8,8 @@ import statsmodels.api as sm
 from lmfit import Model  # non-linear optimization by Levenberg-Marquardt algorithm
 import nature_model_submit
 
-'''
-城市统计年鉴（2018）中有298个城市，其中海南省三沙市比较特殊，没有人口数据，所以剔除；
-剩余297个城市中缺失GDP（地区生产总值）数据的城市有：嘉峪关、儋州、中山、东莞和重庆
-查询"中国统计信息网"相关报告补充这5个城市的GDP数据（2017年内），
-1）嘉峪关（2109900万元）：http://www.tjcn.org/tjgb/28gs/35595.html
-2）儋州（2880400万元）：http://www.tjcn.org/tjgb/21hn/35463.html
-3）中山（34503100万元）：http://www.tjcn.org/tjgb/19gd/35456.html
-4）东莞（75821200万元）：http://www.tjcn.org/tjgb/19gd/35455.html
-5）重庆（195002700万元）：http://www.tjcn.org/tjgb/22cq/35464.html
-
-注：疫情数据Wuhan-2019-nCoV.csv为病例实际统计时间，发布时间与统计相差1天（从2月7日起，直辖市除外）
-疫情数据来源：https://github.com/canghailan/Wuhan-2019-nCoV
-'''
-'''
-estimate method:
-We use the source code library of lmfit in python
-“LMFIT: Non-linear least-square minimization and curve-fitting for Python” (Newville et al. 2016)
-to estimate the parameters in our models. The relevant codes are provided as follows.
-'''
 data_path = "nature-data/pneumonia_panel_296_cities(submit).csv"
-days = 27
+days = 27  # from Jan. 24 to Feb. 19
 
 
 def exponential_logistic_for_plot(X, gamma, omega, alpha, beta_1):
@@ -45,7 +26,7 @@ def plot_dynamic_model_performance_3d():
     ax.view_init(elev=15, azim=-35)
     data = panel
     x = data["day"]
-    y = data["Wuhan_outflow"]
+    y = data["wuhan_outflow"]
     z = data["confirmed"]
     y = np.log(y)
     X = np.vstack((y, x))
@@ -59,13 +40,13 @@ def plot_dynamic_model_performance_3d():
     data["error"] = data["confirmed_pred"] - data["confirmed"]
     df = data[data["error"] < 0]
     x = df["day"]
-    y = df["Wuhan_outflow"]
+    y = df["wuhan_outflow"]
     z = df["confirmed"]
     y = np.log(y)
     ax.scatter(x, y, z, s=50, marker=".", c="#DC143C")
     df = data[data["error"] >= 0]
     x = df["day"]
-    y = df["Wuhan_outflow"]
+    y = df["wuhan_outflow"]
     z = df["confirmed"]
     y = np.log(y)
     ax.scatter(x, y, z, s=50, marker=".", c="k")
@@ -83,14 +64,14 @@ def plot_dynamic_model_performance_3d():
     plt.xlim(1, 27)
     plt.ylim(0, 15)
     plt.tight_layout()
-    plt.savefig("nature-output/3D(china).tiff")
+    plt.savefig("nature-output/Figure-1(China).png")
     plt.close()
-    data = panel[panel["province"] == "湖北省"]
+    data = panel[panel["province_en"] == "Hubei"]
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, projection='3d')
     ax.view_init(elev=15, azim=-35)
-    x = df["day"]
-    y = data["Wuhan_outflow"]
+    x = data["day"]
+    y = data["wuhan_outflow"]
     z = data["confirmed"]
     y = np.log(y)
     X = np.vstack((y, x))
@@ -104,13 +85,13 @@ def plot_dynamic_model_performance_3d():
     data["error"] = data["confirmed_pred"] - data["confirmed"]
     df = data[data["error"] < 0]
     x = df["day"]
-    y = df["Wuhan_outflow"]
+    y = df["wuhan_outflow"]
     z = df["confirmed"]
     y = np.log(y)
     ax.scatter(x, y, z, s=50, marker=".", c="#DC143C")
     df = data[data["error"] >= 0]
     x = df["day"]
-    y = df["Wuhan_outflow"]
+    y = df["wuhan_outflow"]
     z = df["confirmed"]
     y = np.log(y)
     ax.scatter(x, y, z, s=50, marker=".", c="k")
@@ -128,14 +109,14 @@ def plot_dynamic_model_performance_3d():
     plt.xlim(1, 27)
     plt.ylim(12, 15)
     plt.tight_layout()
-    plt.savefig("nature-output/3D(hubei).tiff")
+    plt.savefig("nature-output/Figure-1(Hubei).png")
     plt.close()
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, projection='3d')
     ax.view_init(elev=15, azim=-35)
-    data = panel[panel["province"] != "湖北省"]
-    x = df["day"]
-    y = data["Wuhan_outflow"]
+    data = panel[panel["province_en"] != "Hubei"]
+    x = data["day"]
+    y = data["wuhan_outflow"]
     z = data["confirmed"]
     y = np.log(y)
     X = np.vstack((y, x))
@@ -149,13 +130,13 @@ def plot_dynamic_model_performance_3d():
     data["error"] = data["confirmed_pred"] - data["confirmed"]
     df = data[data["error"] < 0]
     x = df["day"]
-    y = df["Wuhan_outflow"]
+    y = df["wuhan_outflow"]
     z = df["confirmed"]
     y = np.log(y)
     ax.scatter(x, y, z, s=50, marker=".", c="#DC143C")
     df = data[data["error"] >= 0]
     x = df["day"]
-    y = df["Wuhan_outflow"]
+    y = df["wuhan_outflow"]
     z = df["confirmed"]
     y = np.log(y)
     ax.scatter(x, y, z, s=50, marker=".", c="k")
@@ -173,10 +154,10 @@ def plot_dynamic_model_performance_3d():
     plt.xlim(1, 27)
     plt.ylim(0, 13)
     plt.tight_layout()
-    plt.savefig("nature-output/3D(without hubei).tiff")
+    plt.savefig("nature-output/Figure-1(without Hubei).png")
 
 
-def plot_correlation_between_cases_and_outflow_log(x="Wuhan_outflow", y="confirmed", size="population"):
+def plot_correlation_between_cases_and_outflow_log(x="wuhan_outflow", y="confirmed", size="population"):
     data = pd.read_csv(data_path)
     data.fillna(0, inplace=True)
     for group in data.groupby(by=["date"]):
@@ -186,7 +167,8 @@ def plot_correlation_between_cases_and_outflow_log(x="Wuhan_outflow", y="confirm
         plt.xscale("log")
         plt.yscale("log")
         coastal = [line.strip() for line in open("nature-data/coastal_cities.txt").readlines()]
-        D = df[~df["city_cn"].isin(["双鸭山", "鹤岗", "鸡西", "七台河"])]  # 剔除部分黑龙江省离群数据后拟合
+        D = df[~df["city_en"].isin(
+            ["Shuangyashan", "Hegang", "Jixi", "Qitaihe"])]  # Exclude some outlier data of Heilongjiang Province
         X = D[x].values + 1
         Y = D[y].values + 1
         lnX = np.log10(X)
@@ -196,14 +178,14 @@ def plot_correlation_between_cases_and_outflow_log(x="Wuhan_outflow", y="confirm
         X = np.arange(1, 10000000, 10000)
         Y = np.power(10, a + b * np.log10(X))
         plt.plot(X, Y, linestyle="--", c="gray")
-        P = df[(df["province"] != "湖北省") & (~df["city_cn"].isin(coastal))]
+        P = df[(df["province_en"] != "Hubei") & (~df["city_cn"].isin(coastal))]
         X = P[x].values + 1
         Y = P[y].values + 1
         z = P[size].values / 5 / 10000
         linewidth = 1
         edgecolor = "k"
         plt.scatter(X, Y, color="#4876FF", marker="o", alpha=0.8, linewidths=linewidth, edgecolor=edgecolor, s=z)
-        P = df[(df["province"] == "湖北省")]
+        P = df[(df["province_en"] == "Hubei")]
         X = P[x].values + 1
         Y = P[y].values + 1
         z = P[size].values / 5 / 10000
@@ -231,11 +213,11 @@ def plot_correlation_between_cases_and_outflow_log(x="Wuhan_outflow", y="confirm
         plt.ylabel("Confirmed cases", fontsize=16)
         plt.legend(loc=2, labelspacing=1, edgecolor="None", facecolor="None", markerscale=2, fontsize=12)
         plt.tight_layout()
-        plt.savefig("nature-output/corr/%s(log).tiff" % title)
+        plt.savefig("nature-output/corr/%s(log).png" % title)
         plt.close()
 
 
-def plot_correlation_between_cases_and_outflow_subgraph(x="Wuhan_outflow", y="confirmed", size="population"):
+def plot_correlation_between_cases_and_outflow_subgraph(x="wuhan_outflow", y="confirmed", size="population"):
     data = pd.read_csv(data_path)
     data.fillna(0, inplace=True)
     ymax = 3000
@@ -247,7 +229,7 @@ def plot_correlation_between_cases_and_outflow_subgraph(x="Wuhan_outflow", y="co
         df = group[1]
         fig = plt.figure(figsize=(5, 5))
         coastal = [line.strip() for line in open("nature-data/coastal_cities.txt").readlines()]
-        D = df[~df["city_cn"].isin(["双鸭山", "鹤岗", "鸡西", "七台河"])]  # 提出部分黑龙江离群数据
+        D = df[~df["city_en"].isin(["Shuangyashan", "Hegang", "Jixi", "Qitaihe"])]
         X = D[x].values
         Y = D[y].values
         est = sm.OLS(Y, sm.add_constant(X)).fit()
@@ -255,14 +237,14 @@ def plot_correlation_between_cases_and_outflow_subgraph(x="Wuhan_outflow", y="co
         X = np.arange(1, 5000000, 100000)
         Y = a + b * X
         plt.plot(X, Y, linestyle="--", c="gray")
-        P = df[(df["province"] != "湖北省") & (~df["city_cn"].isin(coastal))]
+        P = df[(df["province_en"] != "Hubei") & (~df["city_cn"].isin(coastal))]
         X = P[x].values
         Y = P[y].values
         z = P[size].values / 5 / 10000
         linewidth = 1
         edgecolor = "k"
         plt.scatter(X, Y, color="#4876FF", marker="o", alpha=0.8, linewidths=linewidth, edgecolor=edgecolor, s=z)
-        P = df[(df["province"] == "湖北省")]
+        P = df[(df["province_en"] == "Hubei")]
         X = P[x].values
         Y = P[y].values
         z = P[size].values / 5 / 10000
@@ -295,7 +277,7 @@ def plot_correlation_between_cases_and_outflow_subgraph(x="Wuhan_outflow", y="co
         plt.legend(loc=2, labelspacing=1, edgecolor="None", facecolor="None", markerscale=2, fontsize=12)
         left, bottom, width, height = 0.65, 0.35, 0.25, 0.25
         sub_ax = fig.add_axes([left, bottom, width, height])
-        D = df[~df["city_cn"].isin(["双鸭山", "鹤岗", "鸡西", "七台河"])]  # 提出部分黑龙江离群数据
+        D = df[~df["city_en"].isin(["Shuangyashan", "Hegang", "Jixi", "Qitaihe"])]
         X = D[x].values
         Y = D[y].values
         est = sm.OLS(Y, sm.add_constant(X)).fit()
@@ -303,14 +285,14 @@ def plot_correlation_between_cases_and_outflow_subgraph(x="Wuhan_outflow", y="co
         X = np.arange(1, 5000000, 100000)
         Y = a + b * X
         # plt.plot(X, Y, linestyle="--", c="gray")
-        P = df[(df["province"] != "湖北省") & (~df["city_cn"].isin(coastal))]
+        P = df[(df["province_en"] != "Hubei") & (~df["city_cn"].isin(coastal))]
         X = P[x].values
         Y = P[y].values
         z = P[size].values / 5 / 30000
         linewidth = 1
         edgecolor = "k"
         plt.scatter(X, Y, color="#4876FF", marker="o", alpha=0.8, linewidths=linewidth, edgecolor=edgecolor, s=z)
-        P = df[(df["province"] == "湖北省")]
+        P = df[(df["province_en"] == "Hubei")]
         X = P[x].values
         Y = P[y].values
         z = P[size].values / 5 / 30000
@@ -329,11 +311,11 @@ def plot_correlation_between_cases_and_outflow_subgraph(x="Wuhan_outflow", y="co
         plt.ylim(0, ymax2)
         plt.xlim(0, xmax2)
         plt.tight_layout()
-        plt.savefig("nature-output/corr/%s(sub).tiff" % title)
+        plt.savefig("nature-output/corr/%s(sub).png" % title)
         plt.close()
 
 
-def plot_correlation_between_cases_and_outflow(x="Wuhan_outflow", y="confirmed", size="population"):
+def plot_correlation_between_cases_and_outflow(x="wuhan_outflow", y="confirmed", size="population"):
     data = pd.read_csv(data_path)
     data.fillna(0, inplace=True)
     ymax = 150
@@ -343,7 +325,7 @@ def plot_correlation_between_cases_and_outflow(x="Wuhan_outflow", y="confirmed",
         df = group[1]
         plt.figure(figsize=(5, 5))
         coastal = [line.strip() for line in open("nature-data/coastal_cities.txt").readlines()]
-        D = df[~df["city_cn"].isin(["双鸭山", "鹤岗", "鸡西", "七台河"])]  # 提出部分黑龙江离群数据
+        D = df[~df["city_en"].isin(["Shuangyashan", "Hegang", "Jixi", "Qitaihe"])]
         X = D[x].values
         Y = D[y].values
         est = sm.OLS(Y, sm.add_constant(X)).fit()
@@ -351,14 +333,14 @@ def plot_correlation_between_cases_and_outflow(x="Wuhan_outflow", y="confirmed",
         X = np.arange(1, 5000000, 100000)
         Y = a + b * X
         plt.plot(X, Y, linestyle="--", c="gray")
-        P = df[(df["province"] != "湖北省") & (~df["city_cn"].isin(coastal))]
+        P = df[(df["province_en"] != "Hubei") & (~df["city_cn"].isin(coastal))]
         X = P[x].values
         Y = P[y].values
         z = P[size].values / 5 / 10000
         linewidth = 1
         edgecolor = "k"
         plt.scatter(X, Y, color="#4876FF", marker="o", alpha=0.8, linewidths=linewidth, edgecolor=edgecolor, s=z)
-        P = df[(df["province"] == "湖北省")]
+        P = df[(df["province_en"] == "Hubei")]
         X = P[x].values
         Y = P[y].values
         z = P[size].values / 5 / 10000
@@ -390,7 +372,7 @@ def plot_correlation_between_cases_and_outflow(x="Wuhan_outflow", y="confirmed",
         plt.ylabel("Confirmed cases", fontsize=16)
         plt.legend(loc=2, labelspacing=1, edgecolor="None", facecolor="None", markerscale=2, fontsize=12)
         plt.tight_layout()
-        plt.savefig("nature-output/corr/%s.tiff" % title)
+        plt.savefig("nature-output/corr/%s.png" % title)
         plt.close()
 
 
@@ -398,7 +380,7 @@ def plot_prediction_value(end_day=27, prediction=True):
     data = nature_model_submit.exponential_dynamic_model_estimate(end_day=end_day)
     data["actual-pred"] = data["confirmed"] - data["confirmed_pred"]
     D = data[data["day"] == end_day]
-    D = D[["city_cn", "confirmed", "population", "Wuhan_outflow"]]
+    D = D[["city_cn", "confirmed", "population", "wuhan_outflow"]]
     df = pd.DataFrame(data.groupby(by=["city_cn", "city_en", "province"], as_index=False)["actual-pred"].sum())
     df["risk_index"] = (df["actual-pred"] - df["actual-pred"].mean()) / df["actual-pred"].std()
     df = df.sort_values(by="risk_index", ascending=False)
@@ -420,7 +402,7 @@ def plot_prediction_value(end_day=27, prediction=True):
     plt.xlabel("Risk index $\overline{\Delta}_i$", fontsize=14)
     plt.ylabel("Probability Density", fontsize=14)
     plt.tight_layout()
-    plt.savefig("nature-output/risk_index_distribution_%d.tiff" % end_day)
+    plt.savefig("nature-output/risk_index_distribution_%d.png" % end_day)
     if prediction:
         x_ticks = ["Jan 24", "Jan 25", "Jan 26", "Jan 27", "Jan 28", "Jan 29", "Jan 30", "Jan 31", "Feb 1", "Feb 2",
                    "Feb 3", "Feb 4", "Feb 5", "Feb 6", "Feb 7", "Feb 8", "Feb 9", "Feb 10", "Feb 11", "Feb 12",
@@ -443,10 +425,10 @@ def plot_prediction_value(end_day=27, prediction=True):
             plt.text(1, ymax * 3 / 4, "$\overline{\Delta}_i$=%.4f" % risk_index, fontsize=12)
             plt.xticks(x, x_ticks, fontsize=8, rotation=45)
             plt.tight_layout()
-            plt.savefig("nature-output/predictions/%s.tiff" % city_cn)
+            plt.savefig("nature-output/predictions/%s.png" % city_cn)
 
 
-def plot_increased_predictions(end_day=27):
+def plot_increased_prediction_values(end_day=27):
     data = nature_model_submit.exponential_dynamic_increased_model_estimate(end_day=end_day)
     x_ticks = ["Jan l24", "Jan 25", "Jan 26", "Jan 27", "Jan 28", "Jan 29", "Jan 30", "Jan 31", "Feb 1", "Feb 2",
                "Feb 3", "Feb 4", "Feb 5", "Feb 6", "Feb 7", "Feb 8", "Feb 9", "Feb 10", "Feb 11", "Feb 12",
@@ -466,7 +448,7 @@ def plot_increased_predictions(end_day=27):
         plt.legend(edgecolor="None", fontsize=12)
         plt.xticks(x, x_ticks, fontsize=8, rotation=45)
         plt.tight_layout()
-        plt.savefig("nature-output/increased/%s.tiff" % city_cn)
+        plt.savefig("nature-output/increased/%s.png" % city_cn)
 
 
 if __name__ == "__main__":
@@ -474,5 +456,5 @@ if __name__ == "__main__":
     # plot_correlation_between_cases_and_outflow_log()
     # plot_correlation_between_cases_and_outflow_subgraph()
     # plot_correlation_between_cases_and_outflow()
-    # plot_prediction_value()
-    plot_increased_predictions()
+    plot_prediction_value()
+    plot_increased_prediction_values()
