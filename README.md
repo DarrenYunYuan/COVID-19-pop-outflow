@@ -15,7 +15,7 @@ The ***GDP and population*** data is collected from YEARBOOK, however, there are
 3)Zhongshan: http://www.tjcn.org/tjgb/19gd/35456.html  
 4)Dongguan: http://www.tjcn.org/tjgb/19gd/35455.html  
 5)Chongqing: http://www.tjcn.org/tjgb/22cq/35464.html  
-The ***daily COVID-19 cases*** data is from https://github.com/canghailan/Wuhan-2019-nCoV and did some adjustments.  
+The ***daily COVID-19 cases*** data is from https://github.com/canghailan/Wuhan-2019-nCoV and we did some adjustments by date.  
 The ***outflow(from Wuhan)*** data is provided by China Unicom (cumulative value from January 1 to January 24, 2020)
 The ***search index*** data is collected from Baidu Index( http://index.baidu.com/v2/index.html#/).
 
@@ -24,4 +24,8 @@ It lists 57 coastal cities in China (Chinese name)
 
 ### nature-data/province_fix.csv 
 It's the dummies data of 31 province (Except Hong Kong, Macau and Taiwan)
+
+### nature-output
+This directory saves the project results and figures.  
+
 
