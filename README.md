@@ -20,6 +20,8 @@ The ***outflow(from Wuhan)*** data is provided by China Unicom (cumulative value
 The ***search index*** data is collected from Baidu Index( http://index.baidu.com/v2/index.html#/).
 
 ### nature-data/coastal_cities.csv
-this file lists 57 coastal cities in China (Chinese name)
-### 
+It lists 57 coastal cities in China (Chinese name)
+
+### nature-data/province_fix.csv 
+It's the dummies data of 31 province (Except Hong Kong, Macau and Taiwan)
 
