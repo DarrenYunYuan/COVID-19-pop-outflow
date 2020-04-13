@@ -1,4 +1,4 @@
-# COVID-2019-pop-outflow
+# COVID-19-pop-outflow
 ## This is the Python project for Nature manuscript 2020-02-01778B  
 Python development environment used: **Python 3.7.3**  
 **numpy** version required: 1.16.2  
