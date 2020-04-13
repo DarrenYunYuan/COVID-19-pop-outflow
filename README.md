@@ -32,6 +32,6 @@ This directory saves the project results and figures.
 This Python script is to solve the problem of nonlinear model estimation. In this Paper, we proposed 2 types of **static models**(Exponential & Power static Model), 6 types of **dynamic models**(Exponential-Logistic model, Exponential-gompertz model, Exponential-Richards model, Power-Logistic model, Power-gompertz model, Power-Richards model), and 4 types of **dynamic increased models**(dF(X|t)/dt), and we used the LMFIT module to estimate the unknown parameters.##
 
 ### nature_plot_submit.py
-This Python script is to generate figures for the paper. Such as the 3D performance of the relationship among the confirmed cases, outflow from Wuhan and days to Jan. 23, the 2D performance of daily cumulative confirmed cases and outflow from Wuhan，the predicted and actual 
-values of confirmed cases for each city, and the  predicted and actual values of daily increased confirmed cases for each city.
+This Python script is to generate figures for the paper. Such as the 3D performance of the relationship among the confirmed cases, outflow from Wuhan and days to Jan. 23, the 2D performance of daily cumulative confirmed cases and outflow from Wuhan, the predicted and actual 
+values of confirmed cases for each city, and the predicted and actual values of daily increased confirmed cases for each city.
 
