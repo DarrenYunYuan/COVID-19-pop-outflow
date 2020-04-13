@@ -8,7 +8,7 @@ Python development environment used: **Python 3.7.3**
 
 ## Files description
 ### nature-data/pneumonia_panel_296_cities(submit).csv 
-It's the basic data panel for our research, including 296 prefecture-level cities in China(based on CHINA CITY STATISTICAL YEARBOOK(2018)) and the time window of 27 days(from Jan. 24 to Feb. 19, 2020) 
+It's the basic data panel for our research, including 296 prefecture-level cities in China(based on CHINA CITY STATISTICAL YEARBOOK(2018)), and the time window of 27 days(from Jan. 24 to Feb. 19, 2020).   
 The ***GDP and population*** data is collected from YEARBOOK, however, there are some missing values of GDP in the YEARBOOK, so we queried the GDP values of these cities in 2017 from the Chinese statistical information website(www.tjcn.org), details as following:  
 1)Jiayuguan(嘉峪关): http://www.tjcn.org/tjgb/28gs/35595.html  
 2)Danzhou(儋州): http://www.tjcn.org/tjgb/21hn/35463.html  
