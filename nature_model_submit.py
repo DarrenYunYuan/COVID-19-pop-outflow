@@ -11,7 +11,7 @@ We use the source code library of lmfit in python
 to estimate the parameters in our models. The relevant codes are provided as follows.
 '''
 data_path = "nature-data/pneumonia_panel_296_cities(submit).csv"
-days = 27 # from Jan. 24 to Feb. 19
+days = 27  # from Jan. 24 to Feb. 19
 
 INF = 99999999999999
 NAN = 0
@@ -154,9 +154,10 @@ def exponential_static_model_estimate_everyday(y="confirmed", x=["wuhan_outflow"
         Y_pred = result.best_fit
         r2 = r2_score(Y, Y_pred)
         betas = ["beta_1", "beta_2", "beta_3", "beta_4", "beta_5"]
-        line = [day, r2, best_params["alpha"]]
+        line = [day, r2, best_params["alpha"].value]
         for i in range(len(x)):
             line.append(round(best_params[betas[i]].value, 4))
+        line.append(len(df))
         line = [str(i) for i in line]
         file.write(",".join(line))
         file.write("\n")
@@ -392,9 +393,10 @@ def power_static_model_estimate_everyday(y="confirmed", x=["wuhan_outflow", "gdp
         Y_pred = result.best_fit
         r2 = r2_score(Y, Y_pred)
         betas = ["beta_1", "beta_2", "beta_3", "beta_4", "beta_5"]
-        line = [day, r2, best_params["alpha"]]
+        line = [day, r2, best_params["alpha"].value]
         for i in range(len(x)):
             line.append(round(best_params[betas[i]].value, 4))
+        line.append(len(df))
         line = [str(i) for i in line]
         file.write(",".join(line))
         file.write("\n")
@@ -738,10 +740,11 @@ def power_dynamic_increased_model_estimate(end_day=27, y="confirmed", x=["wuhan_
     return data[["city_cn", "city_en", "province", "day", "date", y, "%s_pred" % y]]
 
 
+
 if __name__ == "__main__":
-    pearson_correlation_coefficient()
-    # exponential_static_model_estimate_everyday()
+    # pearson_correlation_coefficient()
+    exponential_static_model_estimate_everyday()
     # exponential_static_model_estimate()
     # exponential_dynamic_model_estimate()
-    # power_static_model_estimate_everyday()
+    power_static_model_estimate_everyday()
     # power_dynamic_model_estimate()
